@@ -1,0 +1,8 @@
+# Ignore all
+*
+
+# Don't ignore myself
+!.gitignore
+
+# Don't ignore *.go
+!*.go
