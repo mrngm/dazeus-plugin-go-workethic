@@ -11,8 +11,8 @@ func WorkEthics(network, channel string, dz *dazeus.DaZeus) {
 ethicLoop:
 	for {
 		now := time.Now()
-		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, now.Location())
-		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, now.Location())
+		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 100, now.Location())
+		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 100, now.Location())
 		nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location())
 		nextnextDay := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location())
 		weekday := now.Weekday() // Sunday = 0, ...
