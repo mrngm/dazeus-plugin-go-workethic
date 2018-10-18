@@ -12,6 +12,7 @@ ethicLoop:
 	for {
 		now := time.Now()
 		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 100, now.Location())
+		today1200 := time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 100, now.Location())
 		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 100, now.Location())
 		nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location())
 		nextnextDay := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location())
@@ -25,6 +26,15 @@ ethicLoop:
 				select {
 				case <-time.After(time.Until(today0900)):
 					dz.Message(network, channel, "Het is weer tijd voor noeste arbeid!")
+					continue ethicLoop
+				}
+			}
+			if now.Before(today1200) {
+				fmt.Println("Waiting until 12:00:00")
+				fmt.Println("Setting a timer: " + time.Until(today1200).String())
+				select {
+				case <-time.After(time.Until(today1200)):
+					dz.Message(network, channel, "Is het al lunchtijd?")
 					continue ethicLoop
 				}
 			}
