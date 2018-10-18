@@ -11,8 +11,9 @@ func WorkEthics(network, channel string, dz *dazeus.DaZeus) {
 ethicLoop:
 	for {
 		now := time.Now()
-		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 100, now.Location())
-		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 100, now.Location())
+		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 200, now.Location())
+		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 200, now.Location())
+		today1730 := time.Date(now.Year(), now.Month(), now.Day(), 17, 30, 0, 200, now.Location())
 		nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location())
 		nextnextDay := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location())
 		weekday := now.Weekday() // Sunday = 0, ...
@@ -34,6 +35,15 @@ ethicLoop:
 				select {
 				case <-time.After(time.Until(today1700)):
 					dz.Message(network, channel, "Het is weer gedaan met de pret. Op naar huis!")
+					continue ethicLoop
+				}
+			}
+			if now.Before(today1730) {
+				fmt.Println("Waiting until 17:30:00")
+				fmt.Println("Setting a timer: " + time.Until(today1730).String())
+				select {
+				case <-time.After(time.Until(today1730)):
+					dz.Message(network, channel, "]17:30")
 					continue ethicLoop
 				}
 			}
