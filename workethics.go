@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
-
+        "math/rand"
 	"github.com/dazeus/dazeus-go"
 )
 
@@ -18,6 +18,12 @@ ethicLoop:
 		nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location())
 		nextnextDay := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location())
 		weekday := now.Weekday() // Sunday = 0, ...
+		
+		// choose a random time between 9:00 and 16:00 for the coffee time notification
+		rand.Seed(time.Now().UTC().UnixNano())
+		randHour := rand.Intn(15 - 9) + 9
+		randMin := rand.Intn(60)
+		todayCoffeeRandom := time.Date(now.Year(), now.Month(), now.Day(), randHour, randMin, 0, 200, now.Location())
 
 		if weekday >= time.Monday && weekday < time.Saturday {
 			fmt.Println("Happy weekday!")
@@ -27,6 +33,15 @@ ethicLoop:
 				select {
 				case <-time.After(time.Until(today0900)):
 					dz.Message(network, channel, "Het is weer tijd voor noeste arbeid!")
+					continue ethicLoop
+				}
+			}
+			if now.Before(todayCoffeeRandom) {
+				fmt.Println("Waiting until random coffee time")
+				fmt.Println("Setting a timer: " + time.Until(todayCoffeeRandom).String())
+				select {
+				case <-time.After(time.Until(todayCoffeeRandom)):
+					dz.Message(network, channel, "Hebben jullie ook zo'n zin in koffie?")
 					continue ethicLoop
 				}
 			}
