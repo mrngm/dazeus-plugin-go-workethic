@@ -7,61 +7,60 @@ import (
 	"github.com/dazeus/dazeus-go"
 )
 
+type timeMessage struct {
+	timedate time.Time
+	message  string
+}
+
 func WorkEthics(network, channel string, dz *dazeus.DaZeus) {
+	var minTimeID string
+	var smallestDuration time.Duration
+	times := make(map[string]timeMessage)
 ethicLoop:
 	for {
 		now := time.Now()
-		today0900 := time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 200, now.Location())
-		today1200 := time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 100, now.Location())
-		today1700 := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 200, now.Location())
-		today1730 := time.Date(now.Year(), now.Month(), now.Day(), 17, 30, 0, 200, now.Location())
-		nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location())
-		nextnextDay := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location())
+		times["start"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 200, now.Location()),
+			message:  "Het is weer tijd voor noeste arbeid!",
+		}
+		times["lunch"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 100, now.Location()),
+			message:  "Is het al lunchtijd?",
+		}
+		times["stop"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 200, now.Location()),
+			message:  "Het is weer gedaan met de pret. Op naar huis!",
+		}
+		times["stophx"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day(), 17, 30, 0, 200, now.Location()),
+			message:  "]17:30",
+		}
+		times["nextday"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, now.Location()),
+		}
+		times["nextnextday"] = timeMessage{
+			timedate: time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 1, 0, now.Location()),
+		}
 		weekday := now.Weekday() // Sunday = 0, ...
 
 		if weekday >= time.Monday && weekday < time.Saturday {
 			fmt.Println("Happy weekday!")
-			if now.Before(today0900) {
-				fmt.Println("Waiting until 09:00:00")
-				fmt.Println("Setting a timer: " + time.Until(today0900).String())
-				select {
-				case <-time.After(time.Until(today0900)):
-					dz.Message(network, channel, "Het is weer tijd voor noeste arbeid!")
-					continue ethicLoop
+			smallestDuration, _ = time.ParseDuration("1337h")
+			for id, t := range times {
+				// Determine what time is closest to now
+				if time.Until(t.timedate) >= 0 && time.Until(t.timedate) < smallestDuration {
+					smallestDuration = time.Until(t.timedate)
+					minTimeID = id
 				}
 			}
-			if now.Before(today1200) {
-				fmt.Println("Waiting until 12:00:00")
-				fmt.Println("Setting a timer: " + time.Until(today1200).String())
-				select {
-				case <-time.After(time.Until(today1200)):
-					dz.Message(network, channel, "Is het al lunchtijd?")
-					continue ethicLoop
-				}
-			}
-			if now.Before(today1700) {
-				fmt.Println("Waiting until 17:00:00")
-				fmt.Println("Setting a timer: " + time.Until(today1700).String())
-				select {
-				case <-time.After(time.Until(today1700)):
-					dz.Message(network, channel, "Het is weer gedaan met de pret. Op naar huis!")
-					continue ethicLoop
-				}
-			}
-			if now.Before(today1730) {
-				fmt.Println("Waiting until 17:30:00")
-				fmt.Println("Setting a timer: " + time.Until(today1730).String())
-				select {
-				case <-time.After(time.Until(today1730)):
-					dz.Message(network, channel, "]17:30")
-					continue ethicLoop
-				}
-			}
-			// We're done for today, set a timer for 1 second after midnight
-			fmt.Println("It's time for bed. Good night.")
-			fmt.Println("Setting a timer: " + time.Until(nextDay).String())
+
+			// Start a timer
+			fmt.Printf("Setting a timer for '%s' (%s): %s\n", minTimeID, times[minTimeID].message, time.Until(times[minTimeID].timedate).String())
 			select {
-			case <-time.After(time.Until(nextDay)):
+			case <-time.After(time.Until(times[minTimeID].timedate)):
+				if times[minTimeID].message != "" {
+					dz.Message(network, channel, times[minTimeID].message)
+				}
 				continue ethicLoop
 			}
 		}
@@ -69,9 +68,9 @@ ethicLoop:
 		if weekday == time.Saturday {
 			// Set a timer for next Monday 00:00:01
 			fmt.Println("Today is weekend, namely " + weekday.String() + ", go relax!")
-			fmt.Println("Setting a timer: " + time.Until(nextnextDay).String())
+			fmt.Println("Setting a timer: " + time.Until(times["nextnextDay"].timedate).String())
 			select {
-			case <-time.After(time.Until(nextnextDay)):
+			case <-time.After(time.Until(times["nextnextDay"].timedate)):
 				continue ethicLoop
 			}
 		}
@@ -79,9 +78,9 @@ ethicLoop:
 		if weekday == time.Sunday {
 			// Set a timer for next Monday 00:00:01
 			fmt.Println("Today is weekend, namely " + weekday.String() + ", go relax!")
-			fmt.Println("Setting a timer: " + time.Until(nextDay).String())
+			fmt.Println("Setting a timer: " + time.Until(times["nextDay"].timedate).String())
 			select {
-			case <-time.After(time.Until(nextDay)):
+			case <-time.After(time.Until(times["nextDay"].timedate)):
 				continue ethicLoop
 			}
 		}
