@@ -68,9 +68,9 @@ ethicLoop:
 		if weekday == time.Saturday {
 			// Set a timer for next Monday 00:00:01
 			fmt.Println("Today is weekend, namely " + weekday.String() + ", go relax!")
-			fmt.Println("Setting a timer: " + time.Until(times["nextnextDay"].timedate).String())
+			fmt.Println("Setting a timer: " + time.Until(times["nextnextday"].timedate).String())
 			select {
-			case <-time.After(time.Until(times["nextnextDay"].timedate)):
+			case <-time.After(time.Until(times["nextnextday"].timedate)):
 				continue ethicLoop
 			}
 		}
@@ -78,9 +78,9 @@ ethicLoop:
 		if weekday == time.Sunday {
 			// Set a timer for next Monday 00:00:01
 			fmt.Println("Today is weekend, namely " + weekday.String() + ", go relax!")
-			fmt.Println("Setting a timer: " + time.Until(times["nextDay"].timedate).String())
+			fmt.Println("Setting a timer: " + time.Until(times["nextday"].timedate).String())
 			select {
-			case <-time.After(time.Until(times["nextDay"].timedate)):
+			case <-time.After(time.Until(times["nextday"].timedate)):
 				continue ethicLoop
 			}
 		}
